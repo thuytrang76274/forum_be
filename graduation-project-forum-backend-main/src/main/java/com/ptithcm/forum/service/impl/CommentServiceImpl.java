@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public ResponseDto<CommentDto> createComment(CommentDto commentDto) {
-    Post post = postRepository.findById(commentDto.getId()).orElseThrow(
+    Post post = postRepository.findById(commentDto.getPost().getId()).orElseThrow(
         () -> new NotFoundException(commonService.getMessage(StringConstants.POST_NOT_FOUND)));
     if (!post.isAnalyst()) {
       throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
@@ -74,6 +74,8 @@ public class CommentServiceImpl implements CommentService {
     }
     comment.setContent(null == commentUpdateDto.getContent() ? comment.getContent()
         : commentUpdateDto.getContent());
+    comment.setIsSolution(null == commentUpdateDto.getIsSolution() ? comment.getIsSolution()
+        : commentUpdateDto.getIsSolution());
     LocalDateTime now = LocalDateTime.now();
     comment.setModifiedAt(now);
     comment.setModifiedBy(currentUserLoggedIn.getUsername());

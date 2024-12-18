@@ -79,17 +79,4 @@ public class IssueController {
   public ResponseDto<IssueDto> getIssue(@PathVariable("id") Long issueId) {
     return issueService.getSingleIssue(issueId);
   }
-
-  public class WrapperAssignee {
-    private List<Long> assigneeIds;
-    public WrapperAssignee(List<Long> assigneeIds) {
-      this.assigneeIds = assigneeIds;
-    }
-    public List<Long> getAssigneeIds() {
-      return assigneeIds;
-    }
-    public void setAssigneeIds(List<Long> assigneeIds) {
-      this.assigneeIds = assigneeIds;
-    }
-  }
 }
