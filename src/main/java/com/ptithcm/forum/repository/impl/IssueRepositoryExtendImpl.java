@@ -25,7 +25,6 @@ public class IssueRepositoryExtendImpl implements IssueRepositoryExtend {
       + "left join fetch i.customer c "
       + "left join fetch c.systemCode sc "
       + "left join fetch i.image im "
-      + "left join fetch i.posts p "
       + "left join fetch i.type t "
       + "left join fetch t.systemCode st "
       + "left join fetch i.assignees asi "

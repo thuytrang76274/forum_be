@@ -110,10 +110,19 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
-  public ResponseDto<List<CommentDto>> getCommentsByPost(Long postId, boolean isSolution) {
+  public ResponseDto<List<CommentDto>> getCommentsByPost(Long postId) {
     Post post = getSinglePostById(postId);
     return new ResponseDto<>(
-        commentRepository.getCommentsByPostIdWithSolution(post.getId(), isSolution).stream()
+        commentRepository.getCommentSolutionsByPost(post.getId()).stream()
+            .map(commentMapping::convertCommentToCommentDto)
+            .collect(Collectors.toList()));
+  }
+
+  @Override
+  public ResponseDto<List<CommentDto>> getCommentSolutionsByPost(Long postId) {
+    Post post = getSinglePostById(postId);
+    return new ResponseDto<>(
+        commentRepository.getSolutionCommentsByPostId(post.getId()).stream()
             .map(commentMapping::convertCommentToCommentDto)
             .collect(Collectors.toList()));
   }

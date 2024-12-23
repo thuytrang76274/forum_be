@@ -16,7 +16,9 @@ public interface CommentService {
 
   ResponseDto<CommentDto> unpinComment(Long commentId);
 
-  ResponseDto<List<CommentDto>> getCommentsByPost(Long postId, boolean isSolution);
+  ResponseDto<List<CommentDto>> getCommentsByPost(Long postId);
+
+  ResponseDto<List<CommentDto>> getCommentSolutionsByPost(Long postId);
 
   void deleteComment(Long commentId);
 }

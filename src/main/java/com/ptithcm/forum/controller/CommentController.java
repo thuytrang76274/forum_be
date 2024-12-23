@@ -32,7 +32,12 @@ public class CommentController {
 
   @GetMapping("/post/{id}")
   public ResponseDto<List<CommentDto>> getPostComment(@PathVariable("id") Long postId) {
-    return commentService.getCommentsByPost(postId, false);
+    return commentService.getCommentsByPost(postId);
+  }
+
+  @GetMapping("/post/{id}/solution")
+  public ResponseDto<List<CommentDto>> getPostCommentSolution(@PathVariable("id") Long postId) {
+    return commentService.getCommentSolutionsByPost(postId);
   }
 
   @PostMapping

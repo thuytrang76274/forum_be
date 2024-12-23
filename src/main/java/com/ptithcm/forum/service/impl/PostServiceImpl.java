@@ -89,7 +89,7 @@ public class PostServiceImpl implements PostService {
         .totalPages(postPage.getTotalPages())
         .hasPrevious(postPage.hasPrevious())
         .hasNext(postPage.hasNext())
-        .data(postPage.getContent().stream().map(postMapping::convertPostToPostDtoWithComments)
+        .data(postPage.getContent().stream().map(postMapping::convertPostToPostDto)
             .collect(
                 Collectors.toList()))
         .build());
@@ -101,6 +101,9 @@ public class PostServiceImpl implements PostService {
     User currentUser = commonService.getCurrentUserLoggedIn();
     Post post = postMapping.convertPostDtoToPost(postCreateDto);
     Issue issue = getIssueById(postCreateDto.getIssue().getId());
+    if (!isCurrentUserAllowed(issue, currentUser)) {
+      throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
+    }
     post.setIssue(issue);
     SystemCodeDetail module = getModuleById(postCreateDto.getModule().getId());
     post.setModule(module);
@@ -179,7 +182,7 @@ public class PostServiceImpl implements PostService {
       issueRepository.save(currentIssue);
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeStatusOfIssueWhenPostUpdatedToDone(Issue currentIssue, User currentUser) {
@@ -189,7 +192,7 @@ public class PostServiceImpl implements PostService {
       issueRepository.save(currentIssue);
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeStatusOfIssueWhenPostUpdatedToPendingOrClose(Issue currentIssue,
@@ -202,7 +205,7 @@ public class PostServiceImpl implements PostService {
       issueRepository.save(currentIssue);
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeStatusOfIssueWhenAnalystPostIsDeleted(Issue issue, User currentUser) {
@@ -212,7 +215,7 @@ public class PostServiceImpl implements PostService {
       issueRepository.save(issue);
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void updateStatus(PostDto postUpdateDto, Post currentPost, User currentUser) {
@@ -241,7 +244,7 @@ public class PostServiceImpl implements PostService {
           postUpdateDto.getStatus().toString());
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeFromAnalyst(PostDto postUpdateDto, Post currentPost, User currentUser) {
@@ -256,7 +259,7 @@ public class PostServiceImpl implements PostService {
           postUpdateDto.getStatus().toString());
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeFromDone(PostDto postUpdateDto, Post currentPost, User currentUser) {
@@ -271,7 +274,7 @@ public class PostServiceImpl implements PostService {
           postUpdateDto.getStatus().toString());
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeFromPending(PostDto postUpdateDto, Post currentPost, User currentUser) {
@@ -291,7 +294,7 @@ public class PostServiceImpl implements PostService {
           postUpdateDto.getStatus().toString());
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   private void changeFromClose(PostDto postUpdateDto, Post currentPost, User currentUser) {
@@ -311,7 +314,7 @@ public class PostServiceImpl implements PostService {
           postUpdateDto.getStatus().toString());
       return;
     }
-    throw new NotAllowedException(StringConstants.USER_NOT_ALLOWED);
+    throw new NotAllowedException(commonService.getMessage(StringConstants.USER_NOT_ALLOWED));
   }
 
   @SneakyThrows
@@ -353,6 +356,9 @@ public class PostServiceImpl implements PostService {
 
   private boolean isChangeCustomer(PostDto postCreateDto, Issue issue) {
     if (postCreateDto.getCustomer() == null) {
+      return false;
+    }
+    if (null == issue.getCustomer()) {
       return false;
     }
     return postCreateDto.getCustomer().getId().equals(issue.getCustomer().getId());

@@ -143,7 +143,7 @@ public class IssueServiceImpl implements IssueService {
         .hasPrevious(issuePage.hasPrevious())
         .hasNext(issuePage.hasNext())
         .data(
-            issuePage.getContent().stream().map(issueMapping::convertIssueToIssueDtoWithNumberPosts)
+            issuePage.getContent().stream().map(issueMapping::convertIssueToIssueDto)
                 .collect(Collectors.toList()))
         .build());
   }
@@ -170,8 +170,11 @@ public class IssueServiceImpl implements IssueService {
     Issue issue = issueMapping.convertIssueDtoToIssue(issueCreateDto);
     updateIssueType(issueCreateDto.getType().getId(), issue);
     updateCustomer(issueCreateDto.getCustomer().getId(), issue);
-    updateAssignees(issueCreateDto.getAssignees(), issue, false);
-    setStatusWhenCreateIssue(issueCreateDto, issue);
+    issue.setStatus(IssueStatus.NEW);
+    if (!issueCreateDto.isAssigneeEmpty()) {
+      issue.setStatus(IssueStatus.ASSIGNED);
+      updateAssignees(issueCreateDto.getAssignees(), issue, false);
+    }
     issue.setCreatedBy(currentUserLoggedIn.getUsername());
     issue.setCreatedAt(LocalDateTime.now());
     Image savedImage = uploadImage(imageFile, currentUserLoggedIn);
@@ -533,10 +536,10 @@ public class IssueServiceImpl implements IssueService {
   }
 
   private void setStatusWhenCreateIssue(IssueDto issueCreateDto, Issue issue) {
-    issue.setStatus(IssueStatus.NEW);
-    if (issueCreateDto.isAssigneeEmpty()) {
+    if (!issueCreateDto.isAssigneeEmpty()) {
       updateAssignees(issueCreateDto.getAssignees(), issue, true);
       issue.setStatus(IssueStatus.ASSIGNED);
+      issueRepository.save(issue);
     }
   }
 
